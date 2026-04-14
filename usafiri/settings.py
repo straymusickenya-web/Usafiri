@@ -182,13 +182,15 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ALLOWED_HOSTS = ["localhost", "confoundingly-anteroparietal-joey.ngrok-free.dev"]
+ALLOWED_HOSTS = ["usafiri.co.ke", "www.usafiri.co.ke"]
 
 LOGIN_REDIRECT_URL = 'accounts:dashboard_redirect'
 
 # Add CSRF_TRUSTED_ORIGINS for the ngrok URL
 CSRF_TRUSTED_ORIGINS = [
-    "https://confoundingly-anteroparietal-joey.ngrok-free.dev",  # Include https:// prefix
+    "https://usafiri.co.ke",
+    "https://www.usafiri.co.ke",
+    os.getenv("NGROK_URL", "http://localhost:8000")
 ]
 
 # Email
