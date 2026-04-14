@@ -17,6 +17,7 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: usafiri_web
+    entrypoint: ""
     command: >
       sh -c "
       python manage.py migrate --noinput &&
