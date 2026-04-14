@@ -182,7 +182,7 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-ALLOWED_HOSTS = ["usafiri.co.ke", "www.usafiri.co.ke"]
+ALLOWED_HOSTS = ["usafiri.co.ke", "www.usafiri.co.ke", "localhost"]
 
 LOGIN_REDIRECT_URL = 'accounts:dashboard_redirect'
 
