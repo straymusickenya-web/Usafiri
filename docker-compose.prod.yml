@@ -76,6 +76,8 @@ services:
           memory: 128M
 
   nginx:
+    image: nginx:alpine
+    container_name: usafiri_nginx
     volumes:
       - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro   # Use a prod nginx config
       - static_volume:/app/staticfiles:ro
