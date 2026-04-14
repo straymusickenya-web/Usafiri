@@ -17,12 +17,11 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: usafiri_web
-    entrypoint: ""
     command: >
       sh -c "
       python manage.py migrate --noinput &&
       python manage.py collectstatic --noinput &&
-      gunicorn usafiri.wsgi:application
+      exec gunicorn usafiri.wsgi:application
         --bind 0.0.0.0:8000
         --workers 4
         --threads 2
