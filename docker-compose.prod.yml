@@ -103,6 +103,13 @@ services:
       - web
     networks:
       - usafiri_network
+      - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.usafiri-web.rule=Host(`usafiri.co.ke`, `www.usafiri.co.ke`)"
+      - "traefik.http.routers.usafiri-web.entrypoints=websecure"
+      - "traefik.http.routers.usafiri-web.tls.certresolver=letsencrypt"
+      - "traefik.http.services.usafiri-web.loadbalancer.server.port=80"
     restart: unless-stopped
 
   db:
@@ -152,3 +159,5 @@ volumes:
 networks:
   usafiri_network:
     driver: bridge
+  dokploy-network:
+    external: true
