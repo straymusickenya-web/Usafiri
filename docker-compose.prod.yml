@@ -1,0 +1,116 @@
+# ============================================================================
+# docker-compose.prod.yml — Production overrides (Dokploy)
+# Point Dokploy at this file. It extends docker-compose.yml automatically
+# when placed in the same repo, or reference it directly in Dokploy's
+# "Compose file" setting as: docker-compose.prod.yml
+#
+# IMPORTANT: Set all env vars in Dokploy's Environment tab, NOT in a .env
+# file committed to the repo.
+# ============================================================================
+
+services:
+  web:
+    build:
+      target: production
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py collectstatic --noinput &&
+             gunicorn usafiri.wsgi:application
+               --bind 0.0.0.0:8000
+               --workers 4
+               --threads 2
+               --timeout 60
+               --keep-alive 5
+               --max-requests 1000
+               --max-requests-jitter 100
+               --access-logfile -
+               --error-logfile -
+               --log-level info"
+    environment:
+      - DJANGO_SETTINGS_MODULE=usafiri.settings
+      - DEBUG=False
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/"]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+    # No source bind-mount in production — image is the artifact
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
+        reservations:
+          memory: 256M
+
+  celery_worker:
+    build:
+      target: production
+    command: celery -A usafiri worker --loglevel=warning --concurrency=4 --max-tasks-per-child=1000
+    environment:
+      - DJANGO_SETTINGS_MODULE=usafiri.settings
+      - DEBUG=False
+    healthcheck:
+      test: ["CMD-SHELL", "celery -A usafiri inspect ping -d celery@$$HOSTNAME || exit 1"]
+      interval: 60s
+      timeout: 15s
+      start_period: 30s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
+
+  celery_beat:
+    build:
+      target: production
+    environment:
+      - DJANGO_SETTINGS_MODULE=usafiri.settings
+      - DEBUG=False
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 128M
+
+  nginx:
+    volumes:
+      - ./nginx/nginx.prod.conf:/etc/nginx/nginx.conf:ro   # Use a prod nginx config
+      - static_volume:/app/staticfiles:ro
+      - media_volume:/app/media:ro
+      # Uncomment after setting up certbot:
+      # - /etc/letsencrypt:/etc/letsencrypt:ro
+      # - certbot_challenges:/var/www/certbot:ro
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  db:
+    # Do NOT expose the db port publicly in production
+    # ports: intentionally omitted
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}   # Must be set in Dokploy env
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+
+  redis:
+    # Do NOT expose the redis port publicly in production
+    # ports: intentionally omitted
+    command: >
+      redis-server
+        --appendonly yes
+        --maxmemory 256mb
+        --maxmemory-policy allkeys-lru
+        --requirepass ${REDIS_PASSWORD}    # Set in Dokploy env
+    deploy:
+      resources:
+        limits:
+          memory: 300M
+
+# volumes and networks are inherited from docker-compose.ymld

@@ -1,5 +1,9 @@
 # ============================================================================
-# docker-compose.yml - Usafiri Development
+# docker-compose.yml — Base (shared by dev and prod)
+# Do NOT use this file directly. Use:
+#   Dev:  docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#   Prod: docker compose -f docker-compose.yml -f docker-compose.prod.yml up
+#         (or point Dokploy at docker-compose.prod.yml which extends this one)
 # ============================================================================
 
 services:
@@ -7,16 +11,14 @@ services:
     image: postgres:16-alpine
     container_name: usafiri_db
     environment:
-      POSTGRES_DB: ${POSTGRES_DB:-usafiri}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-usafiri}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_INITDB_ARGS: "-E UTF8 --locale=en_US.UTF-8"
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,8 +30,6 @@ services:
     image: redis:7-alpine
     container_name: usafiri_redis
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
-    ports:
-      - "6379:6379"
     volumes:
       - redis_data:/data
     healthcheck:
@@ -45,14 +45,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: development
     container_name: usafiri_web
-    command: >
-      sh -c "python manage.py migrate &&
-             python manage.py collectstatic --noinput &&
-             gunicorn usafiri.wsgi:application --bind 0.0.0.0:8000 --workers 3 --reload"
     volumes:
-      - .:/app
       - static_volume:/app/staticfiles
       - media_volume:/app/media
     expose:
@@ -70,38 +64,15 @@ services:
     networks:
       - usafiri_network
     restart: unless-stopped
-    develop:
-      watch:
-        - action: sync
-          path: ./accounts
-          target: /app/accounts
-        - action: sync
-          path: ./drivers
-          target: /app/drivers
-        - action: sync
-          path: ./payments
-          target: /app/payments
-        - action: sync
-          path: ./ratings
-          target: /app/ratings
-        - action: sync
-          path: ./core
-          target: /app/core
-        - action: sync
-          path: ./templates
-          target: /app/templates
-        - action: rebuild
-          path: requirements.txt
 
   celery_worker:
     build:
       context: .
       dockerfile: Dockerfile
-      target: development
     container_name: usafiri_celery_worker
     command: celery -A usafiri worker --loglevel=info --concurrency=2 --max-tasks-per-child=1000
     volumes:
-      - .:/app
+      - media_volume:/app/media
     env_file:
       - .env
     environment:
@@ -112,12 +83,6 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD-SHELL", "celery -A usafiri inspect ping || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
     networks:
       - usafiri_network
     restart: unless-stopped
@@ -126,11 +91,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      target: development
     container_name: usafiri_celery_beat
     command: celery -A usafiri beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
-    volumes:
-      - .:/app
     env_file:
       - .env
     environment:
@@ -154,21 +116,6 @@ services:
       - media_volume:/app/media:ro
     ports:
       - "80:80"
-    depends_on:
-      - web
-    networks:
-      - usafiri_network
-    restart: unless-stopped
-
-# Remove in Production, ONLY for Development
-  ngrok:
-    image: ngrok/ngrok:latest
-    container_name: usafiri_ngrok
-    command: http --url=confoundingly-anteroparietal-joey.ngrok-free.dev web:8000
-    environment:
-      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
-    ports:
-      - "4040:4040"  # ngrok dashboard
     depends_on:
       - web
     networks:

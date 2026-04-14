@@ -1,0 +1,84 @@
+# ============================================================================
+# docker-compose.dev.yml — Development overrides
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+# ============================================================================
+
+services:
+  db:
+    ports:
+      - "5432:5432"   # Expose to host for tools like TablePlus / pgAdmin
+
+  redis:
+    ports:
+      - "6379:6379"   # Expose to host for Redis Insight / redis-cli
+
+  web:
+    build:
+      target: development
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py collectstatic --noinput &&
+             gunicorn usafiri.wsgi:application --bind 0.0.0.0:8000 --workers 2 --reload"
+    volumes:
+      # Mount source for hot-reload (overrides base — no named volume bind here)
+      - .:/app
+      - static_volume:/app/staticfiles
+      - media_volume:/app/media
+    environment:
+      - DJANGO_SETTINGS_MODULE=usafiri.settings
+      - DEBUG=True
+    develop:
+      watch:
+        - action: sync
+          path: ./accounts
+          target: /app/accounts
+        - action: sync
+          path: ./drivers
+          target: /app/drivers
+        - action: sync
+          path: ./payments
+          target: /app/payments
+        - action: sync
+          path: ./ratings
+          target: /app/ratings
+        - action: sync
+          path: ./core
+          target: /app/core
+        - action: sync
+          path: ./templates
+          target: /app/templates
+        - action: rebuild
+          path: requirements.txt
+
+  celery_worker:
+    build:
+      target: development
+    volumes:
+      - .:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=usafiri.settings
+      - DEBUG=True
+
+  celery_beat:
+    build:
+      target: development
+    volumes:
+      - .:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=usafiri.settings
+      - DEBUG=True
+
+  # ngrok tunnel for M-Pesa webhooks during local dev
+  ngrok:
+    image: ngrok/ngrok:latest
+    container_name: usafiri_ngrok
+    command: http --url=${NGROK_URL} web:8000
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    ports:
+      - "4040:4040"
+    depends_on:
+      - web
+    networks:
+      - usafiri_network
+    restart: unless-stopped
