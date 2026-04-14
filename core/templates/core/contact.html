@@ -1,0 +1,234 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="min-h-[80vh] py-10">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-8 items-stretch">
+    
+    <section class="relative overflow-hidden rounded-[2rem] bg-[#0f172a] text-white p-8 md:p-10 xl:p-12">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_rgba(148,163,184,0.16),_transparent_24%),radial-gradient(circle_at_bottom_left,_rgba(16,185,129,0.14),_transparent_24%)]"></div>
+
+      <div class="relative h-full flex flex-col justify-between">
+        <div>
+          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-sm font-medium text-slate-100 mb-6">
+            <i class="material-icons text-base">support_agent</i>
+            We’re here to help
+          </div>
+
+          <h1 class="text-4xl md:text-5xl font-black tracking-tight leading-tight mb-5">
+            Let’s talk about
+            <span class="text-emerald-400">your needs</span>.
+          </h1>
+
+          <p class="text-slate-300 text-base md:text-lg leading-relaxed max-w-xl mb-8">
+            Whether you’re a client looking for the right driver or a driver who wants help getting started, send us a message and we’ll get back to you.
+          </p>
+
+          <div class="space-y-4">
+            <div class="contact-feature">
+              <div class="contact-feature-icon bg-white/10 text-white">
+                <i class="material-icons">mail</i>
+              </div>
+              <div>
+                <p class="font-semibold text-white">Fast responses</p>
+                <p class="text-sm text-slate-300">We aim to keep communication clear, quick, and helpful.</p>
+              </div>
+            </div>
+
+            <div class="contact-feature">
+              <div class="contact-feature-icon bg-white/10 text-white">
+                <i class="material-icons">verified_user</i>
+              </div>
+              <div>
+                <p class="font-semibold text-white">Driver and client support</p>
+                <p class="text-sm text-slate-300">Questions about sign up, unlocking, activation, or verification.</p>
+              </div>
+            </div>
+
+            <div class="contact-feature">
+              <div class="contact-feature-icon bg-white/10 text-white">
+                <i class="material-icons">bolt</i>
+              </div>
+              <div>
+                <p class="font-semibold text-white">Simple and direct</p>
+                <p class="text-sm text-slate-300">Tell us what you need and we’ll point you in the right direction.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-10 pt-6 border-t border-white/10">
+          <p class="text-sm text-slate-400">Prefer to explore first?</p>
+          <div class="flex flex-col sm:flex-row gap-3 mt-4">
+            <a href="{% url 'core:about' %}" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-white text-slate-900 font-semibold hover:bg-slate-100 transition-all duration-200 hover:-translate-y-0.5">
+              <i class="material-icons text-base">info</i>
+              Learn About Us
+            </a>
+            <a href="{% url 'accounts:signup_choice' %}" class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl border border-white/15 bg-white/5 text-white font-semibold hover:bg-white hover:text-slate-900 transition-all duration-200 hover:-translate-y-0.5">
+              <i class="material-icons text-base">person_add</i>
+              Get Started
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-[2rem] border border-slate-200 shadow-sm p-6 md:p-8 xl:p-10">
+      <div class="max-w-2xl">
+        <div class="mb-8">
+          <div class="inline-flex items-center gap-2 text-sm font-semibold text-slate-700 bg-slate-100 px-3 py-1.5 rounded-full mb-4">
+            <i class="material-icons text-base">forum</i>
+            Contact Form
+          </div>
+
+          <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-slate-900 mb-3">
+            Send us a message
+          </h2>
+          <p class="text-slate-500 leading-relaxed">
+            Fill in the form below and our team will get back to you as soon as possible.
+          </p>
+        </div>
+
+        <form method="post" class="space-y-5">
+          {% csrf_token %}
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div class="field-group">
+              <label for="{{ form.name.id_for_label }}" class="field-label">Your Name</label>
+              <input
+                id="{{ form.name.id_for_label }}"
+                name="{{ form.name.html_name }}"
+                value="{{ form.name.value|default:'' }}"
+                placeholder="Jane Doe"
+                class="field-input"
+                required
+              >
+              {% if form.name.errors %}
+                <p class="text-sm text-red-600">{{ form.name.errors.0 }}</p>
+              {% endif %}
+            </div>
+
+            <div class="field-group">
+              <label for="{{ form.email.id_for_label }}" class="field-label">Email Address</label>
+              <input
+                id="{{ form.email.id_for_label }}"
+                name="{{ form.email.html_name }}"
+                type="email"
+                value="{{ form.email.value|default:'' }}"
+                placeholder="jane@example.com"
+                class="field-input"
+                required
+              >
+              {% if form.email.errors %}
+                <p class="text-sm text-red-600">{{ form.email.errors.0 }}</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="{{ form.message.id_for_label }}" class="field-label">Message</label>
+            <textarea
+              id="{{ form.message.id_for_label }}"
+              name="{{ form.message.html_name }}"
+              rows="6"
+              placeholder="Tell us how we can help..."
+              class="field-input field-textarea"
+              required
+            >{{ form.message.value|default:'' }}</textarea>
+            {% if form.message.errors %}
+              <p class="text-sm text-red-600">{{ form.message.errors.0 }}</p>
+            {% endif %}
+          </div>
+
+          <div class="flex flex-col sm:flex-row gap-4 pt-2">
+            <button
+              type="submit"
+              class="group inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl bg-slate-900 text-white font-semibold hover:bg-slate-800 transition-all duration-200 hover:-translate-y-0.5 shadow-sm"
+            >
+              <i class="material-icons text-base transition-transform duration-200 group-hover:translate-x-0.5">send</i>
+              Send Message
+            </button>
+
+            <a
+              href="{% url 'core:home' %}"
+              class="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl border border-slate-200 bg-white text-slate-700 font-semibold hover:bg-slate-50 transition-all duration-200"
+            >
+              <i class="material-icons text-base">arrow_back</i>
+              Back Home
+            </a>
+          </div>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-slate-100">
+          <p class="text-sm text-slate-400">
+            We usually respond to genuine support and product questions as quickly as possible.
+          </p>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<style>
+  .contact-feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.9rem;
+  }
+
+  .contact-feature-icon {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .field-label {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgb(51 65 85);
+  }
+
+  .field-input {
+    width: 100%;
+    padding: 0.95rem 1rem;
+    border: 1px solid rgb(226 232 240);
+    border-radius: 1rem;
+    background: rgb(255 255 255);
+    color: rgb(15 23 42);
+    font-size: 1rem;
+    transition:
+      border-color 180ms ease,
+      box-shadow 180ms ease,
+      transform 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .field-input::placeholder {
+    color: rgb(148 163 184);
+  }
+
+  .field-input:hover {
+    border-color: rgb(203 213 225);
+  }
+
+  .field-input:focus {
+    outline: none;
+    border-color: rgb(15 23 42);
+    box-shadow: 0 0 0 4px rgba(15, 23, 42, 0.08);
+    transform: translateY(-1px);
+  }
+
+  .field-textarea {
+    min-height: 160px;
+    resize: vertical;
+  }
+</style>
+{% endblock %}

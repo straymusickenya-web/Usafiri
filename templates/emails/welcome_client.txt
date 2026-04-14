@@ -1,0 +1,12 @@
+Welcome to Usafiri, {{ user.first_name|default:user.username }}.
+
+Your client account is ready.
+
+What you can do now:
+- Browse verified drivers
+- Search by destination, vehicle type, and seats
+- Unlock contact details when you find the right match
+- Track payments and activity
+
+Start here:
+{{ drivers_url }}

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>{{ app_name }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        background: #f8fafc;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #0f172a;
+      }
+      .wrapper {
+        width: 100%;
+        background: #f8fafc;
+        padding: 32px 16px;
+      }
+      .card {
+        max-width: 620px;
+        margin: 0 auto;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        overflow: hidden;
+      }
+      .header {
+        background: linear-gradient(135deg, #0f172a, #1e293b);
+        color: white;
+        padding: 28px 28px 24px;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .logo {
+        display: block;
+        height: 44px;
+        width: auto;
+        border: 0;
+        outline: none;
+        text-decoration: none;
+      }
+      .brand-name {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: #ffffff;
+      }
+      .body {
+        padding: 32px 28px;
+        line-height: 1.7;
+        color: #334155;
+        font-size: 15px;
+      }
+      .button {
+        display: inline-block;
+        background: #0f172a;
+        color: #ffffff !important;
+        text-decoration: none;
+        padding: 14px 22px;
+        border-radius: 14px;
+        font-weight: 700;
+      }
+      .button-green {
+        background: #10b981;
+      }
+      .muted {
+        color: #64748b;
+        font-size: 14px;
+      }
+      .panel {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 16px;
+        padding: 16px 18px;
+        margin: 18px 0;
+      }
+      .footer {
+        padding: 24px 28px 32px;
+        color: #94a3b8;
+        font-size: 13px;
+        text-align: center;
+      }
+      @media only screen and (max-width: 600px) {
+        .header, .body, .footer {
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+        .logo {
+          height: 38px;
+        }
+        .brand-name {
+          font-size: 20px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <div class="card">
+        <div class="header">
+          <div class="brand">
+            <img
+              src="https://res.cloudinary.com/dqpqalmue/image/upload/v1766160992/usafiri_aqdwdd.svg"
+              alt="Usafiri"
+              class="logo"
+            />
+            <div class="brand-name">Usafiri</div>
+          </div>
+        </div>
+
+        <div class="body">
+          {% block email_content %}{% endblock %}
+        </div>
+
+        <div class="footer">
+          © Usafiri. Safe, fast, reliable.<br>
+          This email was sent by {{ app_name|default:"Usafiri" }}.
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

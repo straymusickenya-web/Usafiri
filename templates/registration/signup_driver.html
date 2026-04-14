@@ -1,0 +1,352 @@
+{% extends "core/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="min-h-[85vh] flex items-center justify-center py-10">
+  <div class="w-full max-w-7xl grid grid-cols-1 xl:grid-cols-2 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+
+    <!-- Left Panel -->
+    <div class="hidden xl:flex flex-col justify-between bg-gradient-to-br from-blue-950 via-blue-900 to-slate-900 text-white p-10 xl:p-12">
+      <div>
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/10 text-sm font-medium mb-6">
+          <i class="material-icons text-base">local_taxi</i>
+          Driver Registration
+        </div>
+
+        <h1 class="text-4xl xl:text-5xl font-bold leading-tight mb-4">
+          Build a trusted driver profile.
+        </h1>
+        <p class="text-blue-100 text-lg leading-relaxed max-w-md">
+          Join Usafiri as a driver, add your destinations, upload your ID for verification, and become discoverable by clients searching for reliable transport.
+        </p>
+      </div>
+
+      <div class="space-y-4 mt-10">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+            <i class="material-icons text-base">verified_user</i>
+          </div>
+          <div>
+            <p class="font-semibold">Get verified</p>
+            <p class="text-sm text-blue-100">Upload your ID so your profile can be reviewed and trusted by clients.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+            <i class="material-icons text-base">route</i>
+          </div>
+          <div>
+            <p class="font-semibold">Add destinations</p>
+            <p class="text-sm text-blue-100">List where you serve so clients can find you more easily.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+            <i class="material-icons text-base">search</i>
+          </div>
+          <div>
+            <p class="font-semibold">Get discovered</p>
+            <p class="text-sm text-blue-100">Once activated, your profile appears in client searches on the platform.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="p-6 sm:p-8 lg:p-10 xl:p-12">
+      <div class="max-w-3xl mx-auto">
+        <div class="mb-8">
+          <p class="text-sm font-semibold text-blue-600 mb-2">Create Driver Account</p>
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            Sign up as a driver
+          </h2>
+          <p class="text-gray-500">
+            Complete your account details, vehicle information, and verification requirements to get started.
+          </p>
+        </div>
+
+        {% if messages %}
+        <div class="mb-6 space-y-2">
+          {% for message in messages %}
+          <div class="p-4 rounded-2xl text-sm {% if message.tags == 'error' %}bg-red-100 text-red-700 border border-red-200{% elif message.tags == 'success' %}bg-green-100 text-green-700 border border-green-200{% else %}bg-blue-100 text-blue-700 border border-blue-200{% endif %}">
+            {{ message }}
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+          {% csrf_token %}
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Account Information -->
+            <div class="rounded-3xl border border-gray-100 bg-gray-50/80 p-6">
+              <div class="flex items-center gap-3 mb-5">
+                <div class="w-11 h-11 rounded-2xl bg-blue-50 flex items-center justify-center">
+                  <i class="material-icons text-blue-600">person</i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-gray-900">Account Information</h3>
+                  <p class="text-sm text-gray-500">Basic details for your login account.</p>
+                </div>
+              </div>
+
+              <div class="space-y-4">
+                <div>
+                  <label for="{{ user_form.username.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Username*
+                  </label>
+                  {{ user_form.username }}
+                  {% if user_form.username.help_text %}
+                  <p class="text-xs text-gray-500 mt-1">{{ user_form.username.help_text }}</p>
+                  {% endif %}
+                  {% if user_form.username.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ user_form.username.errors.0 }}</p>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label for="{{ user_form.email.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Email address*
+                  </label>
+                  {{ user_form.email }}
+                  {% if user_form.email.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ user_form.email.errors.0 }}</p>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label for="{{ user_form.phone_number.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Phone number*
+                  </label>
+                  {{ user_form.phone_number }}
+                  {% if user_form.phone_number.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ user_form.phone_number.errors.0 }}</p>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label for="{{ user_form.password.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Password*
+                  </label>
+                  {{ user_form.password }}
+                  {% if user_form.password.help_text %}
+                  <p class="text-xs text-gray-500 mt-1">{{ user_form.password.help_text }}</p>
+                  {% endif %}
+                  {% if user_form.password.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ user_form.password.errors.0 }}</p>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label for="{{ user_form.first_name.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    First name*
+                  </label>
+                  {{ user_form.first_name }}
+                  {% if user_form.first_name.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ user_form.first_name.errors.0 }}</p>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label for="{{ user_form.last_name.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Last name*
+                  </label>
+                  {{ user_form.last_name }}
+                  {% if user_form.last_name.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ user_form.last_name.errors.0 }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Driver Information -->
+            <div class="rounded-3xl border border-gray-100 bg-gray-50/80 p-6">
+              <div class="flex items-center gap-3 mb-5">
+                <div class="w-11 h-11 rounded-2xl bg-green-50 flex items-center justify-center">
+                  <i class="material-icons text-green-600">directions_car</i>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-gray-900">Driver & Vehicle Information</h3>
+                  <p class="text-sm text-gray-500">Details clients use to discover and trust you.</p>
+                </div>
+              </div>
+
+              <div class="space-y-4">
+                <div>
+                  <label for="{{ profile_form.id_number.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    ID number*
+                  </label>
+                  {{ profile_form.id_number }}
+                  {% if profile_form.id_number.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ profile_form.id_number.errors.0 }}</p>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label for="{{ profile_form.id_photo.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    ID photo*
+                  </label>
+                  {{ profile_form.id_photo }}
+                  {% if profile_form.id_photo.help_text %}
+                  <p class="text-xs text-gray-500 mt-1">{{ profile_form.id_photo.help_text }}</p>
+                  {% endif %}
+                  {% if profile_form.id_photo.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ profile_form.id_photo.errors.0 }}</p>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label for="{{ profile_form.vehicle_type.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Vehicle type*
+                  </label>
+                  {{ profile_form.vehicle_type }}
+                  {% if profile_form.vehicle_type.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ profile_form.vehicle_type.errors.0 }}</p>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label for="{{ profile_form.vehicle_seats.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Vehicle seats*
+                  </label>
+                  {{ profile_form.vehicle_seats }}
+                  {% if profile_form.vehicle_seats.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ profile_form.vehicle_seats.errors.0 }}</p>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label for="{{ profile_form.location.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Base location*
+                  </label>
+                  {{ profile_form.location }}
+                  {% if profile_form.location.help_text %}
+                  <p class="text-xs text-gray-500 mt-1">{{ profile_form.location.help_text }}</p>
+                  {% endif %}
+                  {% if profile_form.location.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ profile_form.location.errors.0 }}</p>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label for="{{ profile_form.destinations.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Destinations you serve*
+                  </label>
+                  {{ profile_form.destinations }}
+                  {% if profile_form.destinations.help_text %}
+                  <p class="text-xs text-gray-500 mt-1">{{ profile_form.destinations.help_text }}</p>
+                  {% endif %}
+                  {% if profile_form.destinations.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ profile_form.destinations.errors.0 }}</p>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label for="{{ user_form.captcha.id_for_label }}" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Captcha*
+                  </label>
+                  {{ user_form.captcha }}
+                  {% if user_form.captcha.errors %}
+                  <p class="text-sm text-red-600 mt-1">{{ user_form.captcha.errors.0 }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-start gap-3 px-1 pt-2 col-span-full">
+            <input
+              type="checkbox"
+              id="accept_terms_driver"
+              name="accept_terms"
+              required
+              class="mt-1 w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 shrink-0"
+            />
+            <label for="accept_terms_driver" class="text-sm text-gray-600 leading-snug">
+              I have read and agree to the
+              <a href="{% url 'core:terms' %}" target="_blank" class="text-blue-600 hover:underline font-medium">Terms of Service</a>
+              and
+              <a href="{% url 'core:privacy' %}" target="_blank" class="text-blue-600 hover:underline font-medium">Privacy Policy</a>.
+            </label>
+          </div>
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-2">
+            <a
+              href="{% url 'accounts:signup_choice' %}"
+              class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl border border-gray-200 bg-white text-gray-700 font-semibold hover:bg-gray-50 transition"
+            >
+              <i class="material-icons text-base">arrow_back</i>
+              Back to signup options
+            </a>
+
+            <button
+              type="submit"
+              id="submit-btn"
+              onclick="this.disabled=true; this.innerHTML='<i class=\'material-icons text-base animate-spin\'>autorenew</i> Creating account...'; this.form.submit();"
+              class="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-green-600 text-white font-semibold hover:bg-green-700 transition shadow-sm"
+            >
+              <i class="material-icons text-base">arrow_forward</i>
+              Continue
+            </button>
+          </div>
+        </form>
+
+        <p class="mt-6 text-center text-sm text-gray-500">
+          Your profile will be reviewed before becoming visible to clients.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="file"],
+  textarea,
+  select {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 1rem;
+    font-size: 1rem;
+    background: white;
+    transition: all 0.2s ease;
+  }
+
+  input[type="text"]:focus,
+  input[type="email"]:focus,
+  input[type="password"]:focus,
+  input[type="number"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+  }
+
+  input[type="file"] {
+    padding: 0.75rem;
+  }
+
+  textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+</style>
+
+<script>
+  document.querySelector("form").addEventListener("submit", function (e) {
+    const btn = this.querySelector('[type="submit"]');
+    // Only disable if the form is actually valid (browser validation passed)
+    if (this.checkValidity()) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="material-icons text-base animate-spin">autorenew</i> Please wait...';
+    }
+  });
+</script>
+{% endblock %}

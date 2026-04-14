@@ -1,0 +1,24 @@
+{% extends "emails/base.html" %}
+
+{% block email_content %}
+<h2 style="margin-top:0; font-size:28px; color:#0f172a;">Payment received successfully.</h2>
+
+<p>
+  Hi {{ client.first_name|default:client.username }}, your payment has been confirmed successfully.
+</p>
+
+<div class="panel">
+  <p style="margin:0 0 8px;"><strong>Payment summary</strong></p>
+  <p style="margin:4px 0;">Amount: KES {{ payment.amount }}</p>
+  <p style="margin:4px 0;">Driver: {{ driver.full_name }}</p>
+  <p style="margin:4px 0;">Status: {{ payment.status|title }}</p>
+</div>
+
+<p>
+  You can now continue to the driver details page and use the unlocked access available on your account.
+</p>
+
+<p style="margin-top:28px;">
+  <a href="{{ dashboard_url }}" class="button button-green">Open Dashboard</a>
+</p>
+{% endblock %}

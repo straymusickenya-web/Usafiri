@@ -1,0 +1,26 @@
+{% extends "emails/base.html" %}
+
+{% block email_content %}
+<h2 style="margin-top:0; font-size:28px; color:#0f172a;">
+  Your driver account is now active.
+</h2>
+
+<p>
+  Hi {{ user.first_name|default:user.username }}, your Usafiri driver account has been activated successfully.
+</p>
+
+<div class="panel">
+  <p style="margin:0 0 8px;"><strong>What happens next</strong></p>
+  <p style="margin:4px 0;">Your profile is now searchable by clients.</p>
+  <p style="margin:4px 0;">Clients can discover you based on your listed destinations and profile details.</p>
+  <p style="margin:4px 0;">As clients interact with your profile, your ratings and reputation will grow.</p>
+</div>
+
+<p style="margin-top:28px;">
+  <a href="{{ dashboard_url }}" class="button button-green">Open Driver Dashboard</a>
+</p>
+
+<p class="muted">
+  Keep your destinations, phone number, and profile details updated for the best visibility.
+</p>
+{% endblock %}

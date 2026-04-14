@@ -1,0 +1,40 @@
+# Core Django
+Django==5.2.8
+asgiref==3.10.0
+sqlparse==0.5.3
+gunicorn==23.0.0
+
+# Database
+psycopg2-binary==2.9.10
+
+# Environment
+python-dotenv==1.1.0
+
+# Celery + Redis
+celery[redis]==5.4.0
+redis==5.2.1
+django-celery-results==2.6.0
+django-celery-beat==2.9.0
+
+# REST API + Auth
+djangorestframework==3.16.0
+djangorestframework-simplejwt==5.5.0
+
+# Payments
+requests==2.32.3
+
+# Storage
+cloudinary==1.44.0
+
+# Forms & UI
+django-crispy-forms==2.5
+crispy-tailwind==1.0.3
+django-tailwind==4.4.1
+pytailwindcss==0.3.0
+
+# Security
+django-ratelimit==4.1.0
+django-simple-captcha==0.6.1
+
+# Pillow (required by captcha + image fields)
+Pillow==11.2.1

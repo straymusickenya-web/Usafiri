@@ -1,0 +1,145 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <h1 class="text-2xl font-bold mb-6">Edit Driver Profile</h1>
+        
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- Full Name -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Full Name</label>
+                    <input type="text" 
+                           name="full_name" 
+                           value="{{ profile.full_name }}"
+                           class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                           required>
+                </div>
+                
+                <!-- Phone Number -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Phone Number</label>
+                    <input type="tel" 
+                           name="phone_number" 
+                           value="{{ profile.phone_number }}"
+                           class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                           required>
+                </div>
+                
+                <!-- Location -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Location</label>
+                    <input type="text" 
+                           name="location" 
+                           value="{{ profile.location }}"
+                           class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                           required>
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold mb-2">Destinations You Serve</label>
+                    <textarea
+                        name="destinations"
+                        rows="4"
+                        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                        placeholder="Enter one destination per line or separate with commas"
+                    >{% for destination in profile.active_destinations %}{{ destination.name }}{% if not forloop.last %}&#10;{% endif %}{% endfor %}</textarea>
+                    <p class="text-xs text-gray-500 mt-1">Example: Mombasa, Nakuru, Kisumu</p>
+                </div>
+                
+                <!-- Vehicle Type -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Vehicle Type</label>
+                    <select name="vehicle_type" 
+                            class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                            required>
+                        <option value="car" {% if profile.vehicle_type == 'car' %}selected{% endif %}>Car</option>
+                        <option value="van" {% if profile.vehicle_type == 'van' %}selected{% endif %}>Van</option>
+                        <option value="matatu" {% if profile.vehicle_type == 'matatu' %}selected{% endif %}>Matatu</option>
+                        <option value="motorbike" {% if profile.vehicle_type == 'motorbike' %}selected{% endif %}>Motorbike</option>
+                    </select>
+                </div>
+                
+                <!-- Vehicle Seats -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Vehicle Seats</label>
+                    <input type="number" 
+                           name="vehicle_seats" 
+                           value="{{ profile.vehicle_seats }}"
+                           min="1"
+                           class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                           required>
+                </div>
+
+                <!-- Vehicle Details -->
+                <div class="md:col-span-2">
+                    <h2 class="text-lg font-semibold mb-3 text-gray-700 border-t pt-4">Vehicle Details</h2>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Registration Number</label>
+                    <input type="text"
+                        name="registration"
+                        value="{{ vehicle.registration|default:'' }}"
+                        maxlength="20"
+                        placeholder="e.g. KDG 123A"
+                        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 uppercase">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Make</label>
+                    <input type="text"
+                        name="vehicle_make"
+                        value="{{ vehicle.make|default:'' }}"
+                        maxlength="64"
+                        placeholder="e.g. Toyota"
+                        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Model</label>
+                    <input type="text"
+                        name="vehicle_model"
+                        value="{{ vehicle.model|default:'' }}"
+                        maxlength="64"
+                        placeholder="e.g. Hiace"
+                        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-2">Color</label>
+                    <input type="text"
+                        name="vehicle_color"
+                        value="{{ vehicle.color|default:'' }}"
+                        maxlength="32"
+                        placeholder="e.g. White"
+                        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <!-- ID Photo -->
+                <div>
+                    <label class="block text-sm font-semibold mb-2">ID Photo (Optional - to update)</label>
+                    <input type="file" 
+                           name="id_photo" 
+                           accept="image/*"
+                           class="w-full p-3 border rounded-lg">
+                    <p class="text-xs text-gray-500 mt-1">Leave empty to keep current photo</p>
+                </div>
+            </div>
+            
+            <div class="flex gap-3">
+                <button type="submit" 
+                        class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
+                    Save Changes
+                </button>
+                <a href="{% url 'drivers:driver_dashboard' %}" 
+                   class="flex-1 text-center px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-semibold">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,11 @@
+Your driver account is now active.
+
+Hi {{ user.first_name|default:user.username }}, your Usafiri driver account has been activated successfully.
+
+What happens next:
+- Your profile is now searchable by clients
+- Clients can discover you based on your listed destinations and profile details
+- Your ratings and reputation can now grow
+
+Open your dashboard:
+{{ dashboard_url }}

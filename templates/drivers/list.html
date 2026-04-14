@@ -1,0 +1,345 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="slide-up px-4 max-w-7xl mx-auto">
+    <h1 class="text-2xl md:text-3xl font-bold mb-6">Available Drivers</h1>
+
+    <!-- Search Form -->
+    <form method="get" class="mb-8 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <input
+            name="location"
+            placeholder="Base location"
+            value="{{ request.GET.location }}"
+            class="p-3 border rounded w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+        >
+
+        <input
+            name="destination"
+            placeholder="Destination"
+            value="{{ request.GET.destination }}"
+            class="p-3 border rounded w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+        >
+
+        <select
+            name="vehicle_type"
+            class="p-3 border rounded w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+        >
+            <option value="">Vehicle Type</option>
+            <option value="car" {% if request.GET.vehicle_type == 'car' %}selected{% endif %}>Car</option>
+            <option value="van" {% if request.GET.vehicle_type == 'van' %}selected{% endif %}>Van</option>
+            <option value="motorbike" {% if request.GET.vehicle_type == 'motorbike' %}selected{% endif %}>Motorbike</option>
+            <option value="matatu" {% if request.GET.vehicle_type == 'matatu' %}selected{% endif %}>Matatu</option>
+        </select>
+
+        <input
+            name="seats"
+            type="number"
+            placeholder="Min Seats"
+            value="{{ request.GET.seats }}"
+            class="p-3 border rounded w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+        >
+
+        <button
+            type="submit"
+            class="w-full px-6 py-3 bg-blue-950 text-white rounded hover:bg-blue-800 transition font-semibold"
+        >
+            <i class="material-icons text-sm align-middle mr-1">search</i>
+            Search
+        </button>
+    </form>
+
+    <!-- Results Count -->
+    <div class="mb-4 text-gray-600">
+        <p class="text-sm md:text-base">
+            {% if drivers %}
+                Found {{ drivers.count }} driver{{ drivers.count|pluralize }}
+            {% else %}
+                No drivers found
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Drivers Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        {% for d in drivers %}
+        <div class="p-5 bg-white rounded-lg shadow-md hover:shadow-xl transition" id="driver-card-{{ d.id }}">
+            <!-- Driver Header -->
+            <div class="flex items-start justify-between mb-3">
+                <div>
+                    <h3 class="text-lg md:text-xl font-bold text-gray-800">{{ d.first_name }}</h3>
+                    <p class="text-sm text-gray-500 mt-1">
+                        <i class="material-icons text-xs align-middle mr-1">location_on</i>
+                        Base: {{ d.approx_location }}
+                    </p>
+                </div>
+                {% if d.id_verified %}
+                <div class="flex-shrink-0">
+                    <i class="material-icons text-green-600" title="Verified">verified</i>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Vehicle Info -->
+            <div class="flex items-center gap-2 mb-3 text-gray-700 flex-wrap">
+                <div class="flex items-center bg-blue-50 px-3 py-1 rounded-full">
+                    <i class="material-icons text-sm mr-1" style="color: #02A8E6;">directions_car</i>
+                    <span class="text-sm font-medium capitalize">{{ d.vehicle_type }}</span>
+                </div>
+                <div class="flex items-center bg-gray-100 px-3 py-1 rounded-full">
+                    <i class="material-icons text-sm mr-1">event_seat</i>
+                    <span class="text-sm font-medium">{{ d.vehicle_seats }} seats</span>
+                </div>
+                {% with v=d.vehicles.first %}
+                {% if v %}
+                <div class="flex items-center bg-gray-100 px-3 py-1 rounded-full">
+                    <i class="material-icons text-sm mr-1">palette</i>
+                    <span class="text-sm font-medium">{{ v.color }} {{ v.model }}</span>
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <!-- Destinations -->
+            {% with served=d.active_destinations %}
+                {% if served %}
+                <div class="mb-4">
+                    <p class="text-sm font-semibold text-gray-700 mb-2">
+                        <i class="material-icons text-sm align-middle mr-1">route</i>
+                        Goes to
+                    </p>
+                    <div class="flex flex-wrap gap-2">
+                        {% for destination in served|slice:":4" %}
+                        <span class="px-2 py-1 bg-blue-50 text-blue-700 rounded-full text-xs font-medium border border-blue-100">
+                            {{ destination.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Rating -->
+            <div class="mb-4 flex items-center">
+                {% if d.avg_rating %}
+                <div class="flex items-center bg-yellow-50 px-3 py-1 rounded-full">
+                    <i class="material-icons text-sm mr-1 text-yellow-600">star</i>
+                    <span class="font-semibold text-gray-800">{{ d.avg_rating|floatformat:1 }}</span>
+                </div>
+                {% else %}
+                <span class="text-sm text-gray-500 italic">No ratings yet</span>
+                {% endif %}
+            </div>
+
+            <!-- Contact Info (if unlocked) -->
+            {% if d.id in unlocked_driver_ids %}
+            <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <p class="text-sm font-semibold text-green-800 mb-2">
+                    <i class="material-icons text-sm align-middle mr-1">check_circle</i>
+                    Contact Unlocked
+                </p>
+                <div class="space-y-1 text-sm">
+                    <p class="text-gray-700">
+                        <i class="material-icons text-xs align-middle mr-1">person</i>
+                        <strong>Name:</strong> {{ d.full_name }}
+                    </p>
+                    <p class="text-gray-700">
+                        <i class="material-icons text-xs align-middle mr-1">phone</i>
+                        <strong>Phone:</strong> {{ d.phone_number }}
+                    </p>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row gap-2 mt-4">
+                <a
+                    href="{% url 'drivers:detail_partial' d.id %}"
+                    class="flex-1 text-center px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-medium"
+                >
+                    <i class="material-icons text-sm align-middle mr-1">info</i>
+                    View Details
+                </a>
+
+                {% if user.is_authenticated and user.is_client %}
+                    {% if d.id in unlocked_driver_ids %}
+                    <a
+                        href="tel:{{ d.phone_number }}"
+                        class="flex-1 text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+                    >
+                        <i class="material-icons text-sm align-middle mr-1">phone</i>
+                        Call Now
+                    </a>
+                    {% else %}
+                    <form method="post" action="{% url 'drivers:unlock_contact' d.id %}" class="flex-1" onsubmit="disableBtn(this)">
+                        {% csrf_token %}
+                        <button
+                            type="submit"
+                            id="unlock-btn-{{ d.id }}"
+                            class="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <i class="material-icons text-sm align-middle mr-1">lock_open</i>
+                            <span class="hidden sm:inline">Unlock Contact</span>
+                            <span class="sm:hidden">Unlock</span>
+                            <span class="text-xs block sm:inline">(KES 10)</span>
+                        </button>
+                    </form>
+                    {% endif %}
+                {% elif not user.is_authenticated %}
+                <a
+                    href="{% url 'accounts:login' %}"
+                    class="flex-1 text-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition font-medium"
+                >
+                    <i class="material-icons text-sm align-middle mr-1">login</i>
+                    Login to Unlock
+                </a>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full">
+            <div class="bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg p-8 md:p-12 text-center">
+                <i class="material-icons text-6xl text-gray-400 mb-4">search_off</i>
+                <h3 class="text-xl font-semibold text-gray-700 mb-2">No Drivers Found</h3>
+                <p class="text-gray-600 mb-6">
+                    No drivers match your search criteria. Try adjusting your filters.
+                </p>
+                <a
+                    href="{% url 'drivers:list' %}"
+                    class="inline-block px-6 py-3 bg-blue-950 text-white rounded-lg hover:bg-blue-800 transition"
+                >
+                    <i class="material-icons text-sm align-middle mr-1">refresh</i>
+                    Clear Filters
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Call to Action for Non-authenticated Users -->
+    {% if not user.is_authenticated %}
+    <div class="mt-12 bg-gradient-to-r from-blue-950 to-blue-800 text-white rounded-lg p-6 md:p-8 text-center">
+        <h3 class="text-xl md:text-2xl font-bold mb-3">Want to Contact Drivers?</h3>
+        <p class="text-blue-100 mb-6 text-sm md:text-base">
+            Sign up or log in to unlock driver contact information and start your journey.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-3 justify-center">
+            <a
+                href="{% url 'accounts:signup_choice' %}"
+                class="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition font-semibold"
+            >
+                Sign Up Now
+            </a>
+            <a
+                href="{% url 'accounts:login' %}"
+                class="px-6 py-3 bg-white text-blue-950 rounded-lg hover:bg-gray-100 transition font-semibold"
+            >
+                Log In
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- For Drivers Section -->
+    <div class="mt-12 bg-gray-50 rounded-lg p-6 md:p-8 text-center border-2 border-gray-200">
+        <h3 class="text-xl md:text-2xl font-bold mb-3 text-gray-800">Are You a Driver?</h3>
+        <p class="text-gray-600 mb-6 text-sm md:text-base">
+            Join our network of verified drivers and connect with clients looking for reliable transportation.
+        </p>
+        <a
+            href="{% url 'accounts:signup_choice' %}"
+            class="inline-block px-6 py-3 bg-blue-950 text-white rounded-lg hover:bg-blue-800 transition font-semibold"
+        >
+            <i class="material-icons text-sm align-middle mr-1">person_add</i>
+            Become a Driver
+        </a>
+    </div>
+</div>
+
+<script>
+function disableBtn(form) {
+    const btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="material-icons text-sm align-middle mr-1 animate-spin">autorenew</i> Sending M-Pesa prompt...';
+    setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="material-icons text-sm align-middle mr-1">lock_open</i><span class="hidden sm:inline">Unlock Contact</span><span class="sm:hidden">Unlock</span><span class="text-xs block sm:inline">(KES 10)</span>';
+    }, 30000);
+}
+
+(function () {
+    const paymentId = "{{ pending_payment_id|default:'' }}";
+    const driverId  = "{{ pending_driver_id|default:'' }}";
+
+    if (!paymentId || !driverId) return;
+
+    const card = document.getElementById("driver-card-" + driverId);
+    let banner = null;
+
+    if (card) {
+        banner = document.createElement("div");
+        banner.id = "payment-banner-" + driverId;
+        banner.className = "mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800 flex items-center gap-2";
+        banner.innerHTML = '<i class="material-icons text-base animate-spin">autorenew</i> Waiting for M-Pesa confirmation...';
+        card.prepend(banner);
+    }
+
+    function stopPolling(intervalId) {
+        clearInterval(intervalId);
+    }
+
+    function showBannerError(msg) {
+        if (banner && banner.isConnected) {
+            banner.className = "mb-3 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700 flex items-center gap-2";
+            banner.innerHTML = `<i class="material-icons text-base">cancel</i> ${msg}`;
+            // Auto-remove error banner after 5 seconds
+            setTimeout(() => banner && banner.isConnected && banner.remove(), 5000);
+        }
+    }
+
+    const interval = setInterval(async () => {
+        try {
+            const resp = await fetch(`/drivers/payment/${paymentId}/status/`);
+            const data = await resp.json();
+
+            if (data.is_failed) {
+                stopPolling(interval);
+                showBannerError("Payment cancelled or failed. Try unlocking again.");
+                return;
+            }
+
+            if (data.is_complete) {
+                stopPolling(interval);
+
+                if (banner && banner.isConnected) {
+                    banner.className = "mb-3 p-3 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 flex items-center gap-2";
+                    banner.innerHTML = '<i class="material-icons text-base">check_circle</i> Payment confirmed! Loading contact...';
+                }
+
+                // Fetch just the card fragment
+                const cardResp = await fetch(`/drivers/${driverId}/card/`, {
+                    headers: { "X-Requested-With": "XMLHttpRequest" }
+                });
+                const html = await cardResp.text();
+
+                if (card && card.isConnected) {
+                    card.outerHTML = html;
+                }
+            }
+        } catch (err) {
+            console.error("Payment poll error:", err);
+        }
+    }, 3000);
+
+    // Stop polling when user navigates away — prevents ghost intervals
+    window.addEventListener("pagehide", () => stopPolling(interval));
+
+    // Timeout after 2 minutes
+    setTimeout(() => {
+        stopPolling(interval);
+        if (banner && banner.isConnected) {
+            banner.className = "mb-3 p-3 bg-gray-50 border border-gray-200 rounded-lg text-sm text-gray-500 flex items-center gap-2";
+            banner.innerHTML = '<i class="material-icons text-base">info</i> Confirmation timed out. Refresh if you completed payment.';
+        }
+    }, 120000);
+})();
+</script>
+{% endblock %}

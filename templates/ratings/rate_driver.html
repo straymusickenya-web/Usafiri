@@ -1,0 +1,120 @@
+{% extends "core/base.html" %}
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <h1 class="text-2xl font-bold mb-2">Rate {{ driver.full_name }}</h1>
+    <p class="text-gray-600 mb-6">Share your score and a short comment about this driver.</p>
+
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Star Rating -->
+      <div class="mb-6">
+        <label class="block text-sm font-semibold mb-3 text-gray-700">Your Rating</label>
+
+        <div class="flex items-center gap-2" id="star-rating">
+          {% for i in "12345" %}
+          <input
+            type="radio"
+            name="score"
+            value="{{ forloop.counter }}"
+            id="star{{ forloop.counter }}"
+            class="hidden"
+            {% if existing_rating and existing_rating.score == forloop.counter %}checked{% endif %}
+            required
+          >
+          <label
+            for="star{{ forloop.counter }}"
+            data-value="{{ forloop.counter }}"
+            class="star-label cursor-pointer text-5xl leading-none text-gray-300 transition-all duration-200 ease-out hover:scale-110 select-none"
+            aria-label="{{ forloop.counter }} star{% if forloop.counter > 1 %}s{% endif %}"
+          >
+            ★
+          </label>
+          {% endfor %}
+        </div>
+
+        <p class="mt-2 text-sm text-gray-500" id="rating-text">
+          Click a star to rate from 1 to 5.
+        </p>
+      </div>
+
+      <!-- Comment -->
+      <div class="mb-6">
+        <label for="comment" class="block text-sm font-semibold mb-2 text-gray-700">
+          Your Comment (Optional)
+        </label>
+        <textarea
+          name="comment"
+          id="comment"
+          rows="4"
+          class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Share your experience with this driver..."
+        >{% if existing_rating %}{{ existing_rating.comment }}{% endif %}</textarea>
+      </div>
+
+      <div class="flex gap-3">
+        <button
+          type="submit"
+          class="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+        >
+          {% if existing_rating %}Update Rating{% else %}Submit Rating{% endif %}
+        </button>
+
+        <a
+          href="{% url 'drivers:detail_partial' driver.id %}"
+          class="flex-1 text-center px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition font-semibold"
+        >
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const labels = Array.from(document.querySelectorAll(".star-label"));
+    const radios = Array.from(document.querySelectorAll('input[name="score"]'));
+    const ratingText = document.getElementById("rating-text");
+
+    function paintStars(value) {
+      labels.forEach((label) => {
+        const starValue = Number(label.dataset.value);
+        if (starValue <= value) {
+          label.classList.remove("text-gray-300");
+          label.classList.add("text-yellow-400", "drop-shadow-sm");
+        } else {
+          label.classList.remove("text-yellow-400", "drop-shadow-sm");
+          label.classList.add("text-gray-300");
+        }
+      });
+
+      if (value > 0) {
+        ratingText.textContent = `You selected ${value} out of 5 star${value > 1 ? "s" : ""}.`;
+      } else {
+        ratingText.textContent = "Click a star to rate from 1 to 5.";
+      }
+    }
+
+    labels.forEach((label) => {
+      const value = Number(label.dataset.value);
+
+      label.addEventListener("mouseenter", () => paintStars(value));
+      label.addEventListener("click", () => paintStars(value));
+    });
+
+    document.getElementById("star-rating").addEventListener("mouseleave", () => {
+      const checked = document.querySelector('input[name="score"]:checked');
+      paintStars(checked ? Number(checked.value) : 0);
+    });
+
+    radios.forEach((radio) => {
+      radio.addEventListener("change", () => paintStars(Number(radio.value)));
+    });
+
+    const checked = document.querySelector('input[name="score"]:checked');
+    paintStars(checked ? Number(checked.value) : 0);
+  });
+</script>
+{% endblock %}

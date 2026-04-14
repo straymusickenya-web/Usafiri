@@ -1,0 +1,11 @@
+Payment received successfully.
+
+Hi {{ client.first_name|default:client.username }}, your payment has been confirmed successfully.
+
+Payment summary:
+- Amount: KES {{ payment.amount }}
+- Driver: {{ driver.full_name }}
+- Status: {{ payment.status|title }}
+
+Open your dashboard:
+{{ dashboard_url }}

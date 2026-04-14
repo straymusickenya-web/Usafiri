@@ -1,0 +1,27 @@
+{% extends "emails/base.html" %}
+
+{% block email_content %}
+<h2 style="margin-top:0; font-size:28px; color:#0f172a;">Welcome to Usafiri, {{ user.first_name|default:user.username }}.</h2>
+
+<p>
+  Your client account is ready. You can now search for drivers, compare options, unlock contact details, and manage your activity from your dashboard.
+</p>
+
+<div class="panel">
+  <strong>What you can do now:</strong>
+  <ul style="padding-left:18px; margin-bottom:0;">
+    <li>Browse verified drivers</li>
+    <li>Search by destination, vehicle type, and seats</li>
+    <li>Unlock contact details when you find the right match</li>
+    <li>Track payments and activity</li>
+  </ul>
+</div>
+
+<p style="margin-top:28px;">
+  <a href="{{ drivers_url }}" class="button button-green">Find Drivers</a>
+</p>
+
+<p class="muted">
+  You can also log in anytime to continue where you left off.
+</p>
+{% endblock %}

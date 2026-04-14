@@ -1,0 +1,151 @@
+{% extends "core/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="min-h-[75vh] flex items-center justify-center py-10">
+  <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden">
+
+    <!-- Left Panel -->
+    <div class="hidden lg:flex flex-col justify-between bg-gradient-to-br from-green-700 via-emerald-700 to-teal-800 text-white p-10 xl:p-12">
+      <div>
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 border border-white/10 text-sm font-medium mb-6">
+          <i class="material-icons text-base">person_add</i>
+          Client Registration
+        </div>
+
+        <h1 class="text-4xl xl:text-5xl font-bold leading-tight mb-4">
+          Find trusted drivers with ease.
+        </h1>
+        <p class="text-green-50 text-lg leading-relaxed max-w-md">
+          Create your client account to search drivers, unlock contact details, track payments, and manage your trips from one clean dashboard.
+        </p>
+      </div>
+
+      <div class="space-y-4 mt-10">
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+            <i class="material-icons text-base">search</i>
+          </div>
+          <div>
+            <p class="font-semibold">Search smarter</p>
+            <p class="text-sm text-green-100">Find drivers by location, destination, seats, and vehicle type.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+            <i class="material-icons text-base">contacts</i>
+          </div>
+          <div>
+            <p class="font-semibold">Unlock contacts</p>
+            <p class="text-sm text-green-100">Connect quickly with drivers once you find the right match.</p>
+          </div>
+        </div>
+
+        <div class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+            <i class="material-icons text-base">payments</i>
+          </div>
+          <div>
+            <p class="font-semibold">Track activity</p>
+            <p class="text-sm text-green-100">Keep your payment and unlock history organized in one place.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel -->
+    <div class="p-6 sm:p-8 md:p-10 xl:p-12">
+      <div class="max-w-xl mx-auto">
+        <div class="mb-8">
+          <p class="text-sm font-semibold text-green-600 mb-2">Create Client Account</p>
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+            Sign up as a client
+          </h2>
+          <p class="text-gray-500">
+            Fill in your details below to start browsing and connecting with drivers on Usafiri.
+          </p>
+        </div>
+
+        {% if form.non_field_errors %}
+        <div class="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <form method="post" class="space-y-5">
+          {% csrf_token %}
+
+          <div class="rounded-2xl border border-gray-100 bg-gray-50/70 p-5">
+            {{ form|crispy }}
+          </div>
+
+          <div class="flex items-start gap-3 px-1">
+            <input
+              type="checkbox"
+              id="accept_terms_client"
+              name="accept_terms"
+              required
+              class="mt-1 w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500 shrink-0"
+            />
+            <label for="accept_terms_client" class="text-sm text-gray-600 leading-snug">
+              I have read and agree to the
+              <a href="{% url 'core:terms' %}" target="_blank" class="text-green-600 hover:underline font-medium">Terms of Service</a>
+              and
+              <a href="{% url 'core:privacy' %}" target="_blank" class="text-green-600 hover:underline font-medium">Privacy Policy</a>.
+            </label>
+          </div>
+
+          <button
+            type="submit"
+            id="submit-btn"
+            onclick="this.disabled=true; this.innerHTML='<i class=\'material-icons text-base animate-spin\'>autorenew</i> Creating account...'; this.form.submit();"
+            class="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-green-600 text-white font-semibold hover:bg-green-700 transition shadow-sm"
+          >
+            <i class="material-icons text-base">check_circle</i>
+            Create Account
+          </button>
+        </form>
+
+        <div class="mt-6 flex items-center gap-3">
+          <div class="h-px bg-gray-200 flex-1"></div>
+          <span class="text-xs uppercase tracking-wide text-gray-400">Already registered?</span>
+          <div class="h-px bg-gray-200 flex-1"></div>
+        </div>
+
+        <div class="mt-6">
+          <a
+            href="{% url 'accounts:login' %}"
+            class="w-full inline-flex items-center justify-center gap-2 py-3.5 rounded-2xl border border-gray-200 bg-white text-gray-700 font-semibold hover:bg-gray-50 transition"
+          >
+            <i class="material-icons text-base">login</i>
+            Login Instead
+          </a>
+        </div>
+
+        <p class="mt-6 text-center text-sm text-gray-500">
+          By creating an account, you’re joining a safer and more reliable way to find transport.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelector("form").addEventListener("submit", function (e) {
+    const checkbox = this.querySelector('[name="accept_terms"]');
+    const btn = this.querySelector('[type="submit"]');
+
+    if (checkbox && !checkbox.checked) {
+      e.preventDefault();
+      checkbox.reportValidity(); // shows native browser tooltip on the checkbox
+      return;
+    }
+
+    if (this.checkValidity()) {
+      btn.disabled = true;
+      btn.innerHTML = '<i class="material-icons text-base animate-spin">autorenew</i> Please wait...';
+    }
+  });
+</script>
+{% endblock %}

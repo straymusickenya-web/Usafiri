@@ -1,0 +1,12 @@
+Welcome to the Usafiri driver network.
+
+Hi {{ user.first_name|default:user.username }}, your driver account has been created successfully.
+
+Your next steps:
+- Complete your profile details
+- Make sure your destinations are up to date
+- Wait for ID verification
+- Complete payment activation so clients can find you
+
+Open your dashboard:
+{{ dashboard_url }}
