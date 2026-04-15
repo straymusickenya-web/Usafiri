@@ -33,6 +33,7 @@ services:
     networks:
       - usafiri_network
       - dokploy-network
+      - default
     restart: unless-stopped
 
   celery_worker:
