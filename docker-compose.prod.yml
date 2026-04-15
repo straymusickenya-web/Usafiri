@@ -105,11 +105,18 @@ services:
       - usafiri_network
       - dokploy-network
     labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.usafiri-web.rule=Host(`usafiri.co.ke`, `www.usafiri.co.ke`)"
-      - "traefik.http.routers.usafiri-web.entrypoints=websecure"
-      - "traefik.http.routers.usafiri-web.tls.certresolver=letsencrypt"
-      - "traefik.http.services.usafiri-web.loadbalancer.server.port=80"
+       - "traefik.enable=true"
+       - "traefik.docker.network=dokploy-network"
+       - "traefik.http.routers.usafiri-web.rule=Host(`usafiri.co.ke`) || Host(`www.usafiri.co.ke`)"
+       - "traefik.http.routers.usafiri-web.entrypoints=websecure"
+       - "traefik.http.routers.usafiri-web.tls.certresolver=letsencrypt"
+       - "traefik.http.services.usafiri-web.loadbalancer.server.port=80"
+       # Redirect www to non-www
+       - "traefik.http.routers.usafiri-www.rule=Host(`www.usafiri.co.ke`)"
+       - "traefik.http.routers.usafiri-www.entrypoints=websecure"
+       - "traefik.http.routers.usafiri-www.middlewares=redirect-www"
+       - "traefik.http.middlewares.redirect-www.redirectregex.regex=^https://www\\.(.*)"
+       - "traefik.http.middlewares.redirect-www.redirectregex.replacement=https://$${1}"
     restart: unless-stopped
 
   db:
