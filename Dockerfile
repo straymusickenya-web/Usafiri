@@ -83,6 +83,9 @@ RUN useradd -m -u 1000 appuser && \
     mkdir -p /app/staticfiles /app/media /app/logs && \
     chown -R appuser:appuser /app
 
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh && chown appuser:appuser /entrypoint.sh
+
 USER appuser
 
 EXPOSE 8000
