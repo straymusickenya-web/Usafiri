@@ -48,6 +48,7 @@ services:
       - media_volume:/app/media
     networks:
       - usafiri_network
+      - dokploy-network
     restart: unless-stopped
 
   celery_worker:
