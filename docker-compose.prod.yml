@@ -22,6 +22,7 @@ services:
       - DEBUG=False
       - POSTGRES_HOST=db
       - REDIS_URL=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - ALLOWED_HOSTS=usafiri.co.ke,www.usafiri.co.ke,localhost,127.0.0.1
     depends_on:
       db:
         condition: service_healthy
