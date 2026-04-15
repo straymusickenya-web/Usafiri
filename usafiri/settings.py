@@ -212,3 +212,6 @@ APP_DRIVERS_URL = "https://usafiri.co.ke/drivers/"
 APP_DRIVER_DASHBOARD_URL = "https://usafiri.co.ke/drivers/dashboard/driver/"
 APP_CLIENT_DASHBOARD_URL = "https://usafiri.co.ke/accounts/dashboard/client/"
 APP_EDIT_PROFILE_URL = "https://usafiri.co.ke/drivers/profile/edit/"
+
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
