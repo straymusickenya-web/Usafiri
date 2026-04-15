@@ -17,22 +17,7 @@ services:
       dockerfile: Dockerfile
       target: production
     container_name: usafiri_web
-    command: >
-      sh -c "
-      python manage.py migrate --noinput &&
-      python manage.py collectstatic --noinput &&
-      exec gunicorn usafiri.wsgi:application
-        --bind 0.0.0.0:8000
-        --workers 4
-        --threads 2
-        --timeout 60
-        --keep-alive 5
-        --max-requests 1000
-        --max-requests-jitter 100
-        --access-logfile -
-        --error-logfile -
-        --log-level info
-      "
+    command: sh -c "python manage.py migrate --noinput && python manage.py collectstatic --noinput && exec gunicorn usafiri.wsgi:application --bind 0.0.0.0:8000 --workers 4 --threads 2 --timeout 60 --keep-alive 5 --max-requests 1000 --max-requests-jitter 100 --access-logfile - --error-logfile - --log-level info"
     environment:
       - DJANGO_SETTINGS_MODULE=usafiri.settings
       - DEBUG=False
